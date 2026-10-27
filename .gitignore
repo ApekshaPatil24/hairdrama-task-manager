@@ -1,0 +1,31 @@
+# Node.js and Next.js
+client/node_modules/
+client/.next/
+client/out/
+client/build/
+client/coverage/
+
+# Python virtual environments
+backend/.venv/
+backend/venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Allow example environment files in subprojects
+!client/.env.example
+!backend/.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
