@@ -637,3 +637,318 @@ select {
     transition: none !important;
   }
 }
+
+
+
+/* ===== Authenticated dashboard workspace ===== */
+
+.dashboard-page {
+  background:
+    radial-gradient(
+      ellipse at 8% 0%,
+      rgb(168 192 164 / 10%),
+      transparent 32%
+    ),
+    radial-gradient(
+      ellipse at 94% 100%,
+      rgb(164 93 66 / 8%),
+      transparent 35%
+    ),
+    #17231b;
+}
+
+.dashboard-main {
+  min-width: 0;
+  background: #f8f7f2;
+}
+
+.dashboard-welcome-surface {
+  isolation: isolate;
+}
+
+.dashboard-welcome-surface::before {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  z-index: -2;
+  pointer-events: none;
+
+  background-image: url("/images/landing/dashboard-waves.svg");
+  background-position: 44% 48%;
+  background-repeat: no-repeat;
+  background-size: 108% auto;
+  opacity: .9;
+
+  animation: dashboard-welcome-waves 28s ease-in-out infinite alternate;
+}
+
+.dashboard-welcome-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse at 20% 15%,
+      rgb(168 192 164 / 16%),
+      transparent 45%
+    ),
+    linear-gradient(
+      130deg,
+      rgb(248 247 242 / 2%),
+      transparent 70%
+    );
+}
+
+.dashboard-mascot {
+  transform-origin: center bottom;
+  animation: dashboard-mascot-float 6s ease-in-out infinite;
+}
+
+.dashboard-stat-card {
+  transition:
+    transform 240ms ease,
+    box-shadow 240ms ease,
+    border-color 240ms ease;
+}
+
+.dashboard-stat-card:hover {
+  transform: translateY(-3px);
+  border-color: #d3ddcf;
+  box-shadow: 0 16px 32px -24px rgb(36 74 61 / 25%);
+}
+
+.dashboard-task-row {
+  transition: background-color 180ms ease;
+}
+
+.dashboard-task-row:hover {
+  background-color: #fbfaf6;
+}
+
+@keyframes dashboard-welcome-waves {
+  from {
+    background-position: 40% 45%;
+    background-size: 104% auto;
+  }
+
+  to {
+    background-position: 60% 55%;
+    background-size: 112% auto;
+  }
+}
+
+@keyframes dashboard-mascot-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  50% {
+    transform: translateY(-5px) rotate(1deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-welcome-surface::before,
+  .dashboard-mascot {
+    animation: none !important;
+  }
+
+  .dashboard-stat-card,
+  .dashboard-task-row {
+    transition: none !important;
+  }
+}
+
+/* Roomier, moderate-size navigation on the left sidebar. */
+.dashboard-sidebar-scale nav {
+  row-gap: 10px;
+}
+
+.dashboard-sidebar-scale nav a,
+.dashboard-sidebar-scale nav button {
+  min-height: 52px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.dashboard-sidebar-scale nav svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+/* Let the topbar feel connected to both the main workspace and planner. */
+.dashboard-topbar {
+  width: auto;
+  background: rgb(248 247 242 / 96%);
+  backdrop-filter: blur(14px);
+}
+
+.dashboard-topbar-inner {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Tighter, clearer copy for the compact right-side planner. */
+.dashboard-right-sidebar h2 {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.dashboard-right-sidebar h3 {
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.dashboard-right-sidebar p {
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-schedule-card {
+    transition: none !important;
+  }
+}
+
+
+/* ===== Compact, modern sidebar sign-out button ===== */
+
+.dashboard-sidebar-signout {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 43px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px;
+  border: 1px solid #e8d9ce;
+  border-radius: 12px;
+  background: #f8f3ee;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.dashboard-sidebar-signout:hover {
+  border-color: #d9bba7;
+  background: #fbf7f2;
+  box-shadow: 0 4px 12px -9px rgb(164 93 66 / 35%);
+}
+
+.dashboard-sidebar-signout-icon {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f0e7dd;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #a45d42;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.dashboard-sidebar-signout:hover
+  .dashboard-sidebar-signout-icon {
+  background: #a45d42;
+  color: #ffffff;
+}
+
+.dashboard-sidebar-logout {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+/* Reset the existing form wrapper, if present. */
+.dashboard-sidebar-logout form {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Override the original large, dark LogoutButton styles. */
+.dashboard-sidebar-logout button {
+  display: flex !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 30px !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  padding: 6px 8px !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #8a4528 !important;
+  font-family: var(--font-inter), sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease !important;
+}
+
+.dashboard-sidebar-logout button:hover {
+  border-color: #ead8ca !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #713b27 !important;
+}
+
+.dashboard-sidebar-logout button:focus-visible {
+  outline: 2px solid #a45d42 !important;
+  outline-offset: 2px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-sidebar-signout,
+  .dashboard-sidebar-signout-icon,
+  .dashboard-sidebar-logout button {
+    transition: none !important;
+  }
+}
+
+/* Hide the right planner scrollbar without disabling scrolling */
+.dashboard-fixed-right-panel {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.dashboard-fixed-right-panel::-webkit-scrollbar,
+.dashboard-fixed-right-panel *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+.dashboard-fixed-right-panel,
+.dashboard-fixed-right-panel * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Smaller calendar date numbers in the right sidebar */
+.dashboard-right-sidebar .dashboard-calendar-day {
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
