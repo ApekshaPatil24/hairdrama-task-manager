@@ -1,0 +1,57 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" fill="none">
+  <defs>
+    <linearGradient id="sage" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#91AF91" stop-opacity=".05"/>
+      <stop offset=".55" stop-color="#91AF91" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#D8C8A6" stop-opacity=".05"/>
+    </linearGradient>
+    <linearGradient id="clay" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#A45D42" stop-opacity=".02"/>
+      <stop offset=".65" stop-color="#C38C70" stop-opacity=".32"/>
+      <stop offset="1" stop-color="#C38C70" stop-opacity=".03"/>
+    </linearGradient>
+  </defs>
+
+  <path
+    d="M620 -100C860 70 540 160 760 255S1100 330 1290 150V-100Z"
+    fill="url(#sage)"
+  />
+
+  <path
+    d="M-80 300C150 115 300 140 460 240S730 380 920 185 1130 90 1290 130"
+    stroke="#91AF91"
+    stroke-opacity=".30"
+    stroke-width="1.5"
+  />
+
+  <path
+    d="M-80 320C140 145 290 165 455 265S730 405 925 210 1130 115 1290 155"
+    stroke="#91AF91"
+    stroke-opacity=".20"
+    stroke-width="1.5"
+  />
+
+  <path
+    d="M-80 340C125 175 280 190 450 290S735 430 930 235 1130 140 1290 180"
+    stroke="#D8C8A6"
+    stroke-opacity=".22"
+    stroke-width="1.5"
+  />
+
+  <path
+    d="M450 -80C590 70 630 150 565 240S550 350 675 460"
+    stroke="url(#clay)"
+    stroke-width="60"
+  />
+
+  <path
+    d="M720 -80C860 90 900 170 850 270S860 380 970 450"
+    stroke="#A45D42"
+    stroke-opacity=".10"
+    stroke-width="1.5"
+  />
+
+  <circle cx="1010" cy="72" r="3" fill="#D8C8A6" fill-opacity=".6"/>
+  <circle cx="1060" cy="98" r="2" fill="#91AF91" fill-opacity=".7"/>
+</svg>

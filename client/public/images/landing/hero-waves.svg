@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 850" fill="none">
+  <defs>
+    <linearGradient id="sageWave" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E8EEE5" stop-opacity=".92"/>
+      <stop offset=".55" stop-color="#DCE7D9" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#F8F7F2" stop-opacity=".08"/>
+    </linearGradient>
+
+    <linearGradient id="sandWave" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#EDE2CE" stop-opacity=".05"/>
+      <stop offset=".65" stop-color="#E7D8BE" stop-opacity=".54"/>
+      <stop offset="1" stop-color="#D7E5D5" stop-opacity=".55"/>
+    </linearGradient>
+
+    <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#CADCCB" stop-opacity=".08"/>
+      <stop offset=".58" stop-color="#B5CBB7" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#E3EBDf" stop-opacity=".12"/>
+    </linearGradient>
+
+    <filter id="grain">
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency=".8"
+        numOctaves="2"
+        stitchTiles="stitch"
+      />
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 .08"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" mode="soft-light"/>
+    </filter>
+  </defs>
+
+  <rect width="1440" height="850" fill="#F8F7F2"/>
+
+  <path
+    d="M-120 220C100 70 300 40 500 118S780 280 722 455 790 650 1000 740L-120 850Z"
+    fill="url(#sageWave)"
+  />
+
+  <path
+    d="M-110 620C110 390 285 330 438 420S680 710 850 680 1140 440 1540 300V850H-110Z"
+    fill="url(#sandWave)"
+  />
+
+  <path
+    d="M500-80C660 120 710 240 650 440S625 675 790 880H980C770 630 800 450 930 320S1000 100 900-80Z"
+    fill="url(#ribbon)"
+  />
+
+  <path
+    d="M-60 625C170 405 310 370 470 475S725 775 910 690 1245 415 1510 325"
+    stroke="#B5CBB7"
+    stroke-opacity=".58"
+    stroke-width="2"
+  />
+
+  <path
+    d="M-80 690C150 470 305 438 455 540S695 820 895 735 1250 480 1530 390"
+    stroke="#D2DECE"
+    stroke-opacity=".8"
+    stroke-width="3"
+  />
+
+  <path
+    d="M-40 760C180 545 320 530 470 625S730 850 925 790 1290 575 1500 500"
+    stroke="#DDCEB3"
+    stroke-opacity=".56"
+    stroke-width="2"
+  />
+
+  <ellipse
+    cx="1130"
+    cy="180"
+    rx="380"
+    ry="220"
+    fill="#FFFFFF"
+    fill-opacity=".24"
+  />
+
+  <rect width="1440" height="850" filter="url(#grain)" opacity=".12"/>
+</svg>
