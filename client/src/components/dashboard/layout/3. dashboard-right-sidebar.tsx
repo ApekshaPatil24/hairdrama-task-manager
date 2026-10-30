@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays,
   ChevronLeft,
@@ -35,7 +35,11 @@ function normalizeDate(date: string) {
 }
 
 function formatDueDate(date: string) {
-  const parsed = new Date(`${normalizeDate(date)}T12:00:00`);
+  // Parse a date-only value at local noon to avoid timezone day shifts.
+  const [year, month, day] = normalizeDate(date).split("-").map(Number);
+  if (!year || !month || !day) return "No date";
+
+  const parsed = new Date(year, month - 1, day, 12);
   if (Number.isNaN(parsed.getTime())) return "No date";
 
   return new Intl.DateTimeFormat("en-IN", {
@@ -48,30 +52,42 @@ export default function DashboardRightSidebar({
   tasks = [],
   onViewAll,
 }: DashboardRightSidebarProps) {
-  const today = new Date();
-  const todayKey = getDateKey(today);
-  const [visibleMonth, setVisibleMonth] = useState(
-    () => new Date(today.getFullYear(), today.getMonth(), 1)
-  );
+  const [today, setToday] = useState<Date | null>(null);
+  const [visibleMonth, setVisibleMonth] = useState<Date | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const year = visibleMonth.getFullYear();
-  const month = visibleMonth.getMonth();
-  const monthLabel = new Intl.DateTimeFormat("en-IN", {
-    month: "long",
-    year: "numeric",
-  }).format(visibleMonth);
+  useEffect(() => {
+    const currentDate = new Date();
+    setToday(currentDate);
+    setVisibleMonth(
+      new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+    );
+  }, []);
+
+  const todayKey = today ? getDateKey(today) : "";
+  const year = visibleMonth?.getFullYear() ?? 0;
+  const month = visibleMonth?.getMonth() ?? 0;
+  const monthLabel = visibleMonth
+    ? new Intl.DateTimeFormat("en-IN", {
+        month: "long",
+        year: "numeric",
+      }).format(visibleMonth)
+    : "";
 
   const calendarDays = useMemo(() => {
-    const offset = (new Date(year, month, 1).getDay() + 6) % 7;
-    const totalDays = new Date(year, month + 1, 0).getDate();
+    if (!visibleMonth) return [];
+
+    const currentYear = visibleMonth.getFullYear();
+    const currentMonth = visibleMonth.getMonth();
+    const offset = (new Date(currentYear, currentMonth, 1).getDay() + 6) % 7;
+    const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
     const cells = Math.ceil((offset + totalDays) / 7) * 7;
 
     return Array.from({ length: cells }, (_, index) => {
       const day = index - offset + 1;
       return day > 0 && day <= totalDays ? day : null;
     });
-  }, [month, year]);
+  }, [visibleMonth]);
 
   const sortedTasks = useMemo(
     () =>
@@ -93,11 +109,20 @@ export default function DashboardRightSidebar({
     : sortedTasks.slice(0, 3);
 
   function changeMonth(amount: number) {
-    setVisibleMonth(
-      (current) =>
-        new Date(current.getFullYear(), current.getMonth() + amount, 1)
+    setVisibleMonth((current) =>
+      current
+        ? new Date(current.getFullYear(), current.getMonth() + amount, 1)
+        : current
     );
     setSelectedDate(null);
+  }
+
+  if (!today || !visibleMonth) {
+    return (
+      <aside className="dashboard-right-sidebar min-w-0 space-y-5 rounded-[22px] border border-[#E6E8DE] bg-[#FBFCF9] p-3.5 sm:p-4">
+        <p className="text-[10px] text-[#858D80]">Loading calendar...</p>
+      </aside>
+    );
   }
 
   return (
@@ -113,7 +138,6 @@ export default function DashboardRightSidebar({
               {monthLabel}
             </h2>
           </div>
-
           <div className="flex shrink-0 items-center gap-0.5">
             <button
               type="button"
@@ -163,11 +187,9 @@ export default function DashboardRightSidebar({
                 aria-label={`${day} ${monthLabel}`}
                 aria-pressed={isSelected}
                 onClick={() => setSelectedDate(dateKey)}
-                className={`dashboard-calendar-day relative mx-auto flex h-9 w-9 items-center justify-center rounded-full text-[10px] transition-all duration-200 ${
-                isSelected
-                    ? "bg-[#A45D42] font-semibold text-white shadow-[0_5px_12px_rgba(164,93,66,0.22)]"
-                : isToday
-                    ? "border border-[#D4DFD0] font-semibold text-[#244A3D]"
+                className={`relative mx-auto flex h-8 w-8 items-center justify-center rounded-full text-[10px] transition-colors duration-200 ${
+                  isSelected
+                    ? "bg-[#A45D42] font-semibold text-white shadow-[0_4px_10px_rgba(164,93,66,0.18)]"
                     : "text-[#596357] hover:bg-[#E9EEE5]"
                 }`}
               >
@@ -187,7 +209,9 @@ export default function DashboardRightSidebar({
         <button
           type="button"
           onClick={() => {
-            setVisibleMonth(new Date(today.getFullYear(), today.getMonth(), 1));
+            setVisibleMonth(
+              new Date(today.getFullYear(), today.getMonth(), 1)
+            );
             setSelectedDate(todayKey);
           }}
           className="mt-3 text-[10px] font-medium text-[#55745A] transition hover:text-[#244A3D]"
@@ -264,37 +288,21 @@ export default function DashboardRightSidebar({
             })}
           </div>
         ) : (
-          <div className="rounded-[15px] border border-dashed border-[#DDE3D7] bg-white/70 px-3 py-5 text-center">
-            <span className="mx-auto flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#E9EEE5] text-[#55745A]">
-              <CalendarDays size={15} />
+          <div className="rounded-[15px] border border-dashed border-[#DDE3D7] bg-white/70 px-3 py-6 text-center">
+            <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-[#E9EEE5] text-[#55745A]">
+              <CalendarDays size={16} />
             </span>
             <p className="mt-2.5 text-[10px] font-semibold text-[#455548]">
               No tasks scheduled
             </p>
             <p className="mt-1 text-[9px] leading-4 text-[#92988B]">
-              Tasks with this deadline will appear here.
+              {selectedDate
+                ? "There are no tasks for this date."
+                : "Upcoming deadlines will appear here."}
             </p>
-            {selectedDate && (
-              <button
-                type="button"
-                onClick={() => setSelectedDate(null)}
-                className="mt-2 text-[9px] font-semibold text-[#55745A] hover:text-[#244A3D]"
-              >
-                Show upcoming tasks
-              </button>
-            )}
           </div>
         )}
       </section>
-
-      <div className="flex items-start gap-2 rounded-[14px] border border-[#E0E7DB] bg-[#F0F4EC] p-3">
-        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-white text-[#47634E]">
-          <CalendarDays size={12} />
-        </span>
-        <p className="text-[9px] leading-4 text-[#657361]">
-          Select a day to see the tasks scheduled for that date.
-        </p>
-      </div>
     </aside>
   );
 }

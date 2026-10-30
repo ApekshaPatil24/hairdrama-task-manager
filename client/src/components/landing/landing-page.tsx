@@ -3,6 +3,7 @@ import HeroSection from "./hero-section";
 import DashboardPreview from "./dashboard-preview";
 import FeaturesSection from "./features-section";
 import SiteFooter from "./site-footer";
+import { Suspense } from "react"; 
 
 export default function LandingPage() {
   return (
@@ -13,7 +14,9 @@ export default function LandingPage() {
         <DashboardPreview />
         <FeaturesSection />
       </main>
-      <SiteFooter />
+      <Suspense fallback={<footer className="min-h-[100px]" />}>
+  <SiteFooter />
+</Suspense>
     </div>
   );
 }

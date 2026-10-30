@@ -9,8 +9,8 @@ import {
   FolderKanban,
   LayoutDashboard,
   ListTodo,
-  UsersRound,
   LogOut,
+  UsersRound,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -71,8 +71,8 @@ export default function DashboardSidebar({
       aria-label="Dashboard sidebar"
       className={`dashboard-sidebar relative flex h-dvh min-h-0 flex-col overflow-hidden border-r border-[#DDE2D7] bg-[#E8EDE4] text-[#202821] ${
         mobile
-  ? "w-[240px] max-w-[88vw] rounded-r-2xl shadow-2xl"
-  : "w-full lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:h-dvh lg:w-[240px]"
+          ? "w-[270px] max-w-[88vw] rounded-r-2xl shadow-2xl"
+          : "w-full lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:h-dvh lg:w-[240px]"
       }`}
     >
       {/* Compact decorative background */}
@@ -80,12 +80,10 @@ export default function DashboardSidebar({
         aria-hidden="true"
         className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full border border-[#244A3D]/[0.07]"
       />
-
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-6 top-4 h-24 w-24 rounded-full border border-[#D8C8A6]/40"
       />
-
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-12 -left-12 h-36 w-36 rounded-full bg-[#D8C8A6]/15 blur-2xl"
@@ -104,7 +102,7 @@ export default function DashboardSidebar({
             width={3000}
             height={823}
             priority
-            className="h-auto w-[155px] max-w-full"
+            className="h-auto w-[150px] max-w-full"
           />
         </Link>
 
@@ -159,9 +157,7 @@ export default function DashboardSidebar({
                   <Icon size={15} strokeWidth={1.9} />
                 </span>
 
-                <span className="min-w-0 flex-1 truncate">
-                  {item.label}
-                </span>
+                <span className="min-w-0 flex-1 truncate">{item.label}</span>
 
                 {isActive && (
                   <span
@@ -182,21 +178,14 @@ export default function DashboardSidebar({
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] bg-[#E2EADD] text-[#31553D]">
               <CircleHelp size={15} />
             </span>
-
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold text-[#29382E]">
-                Need a hand?
-              </p>
-              <p className="mt-0.5 text-[9px] text-[#798174]">
-                Your work, simplified
-              </p>
+              <p className="text-[11px] font-semibold text-[#29382E]">Need a hand?</p>
+              <p className="mt-0.5 text-[9px] text-[#798174]">Your work, simplified</p>
             </div>
           </div>
-
           <p className="mt-2 text-[9px] leading-4 text-[#687166]">
             Keep your priorities clear and make progress one task at a time.
           </p>
-
           <div className="mt-2 flex items-center gap-1.5 text-[9px] font-semibold text-[#31553D]">
             <CheckCircle2 size={12} />
             <span>One step at a time</span>
@@ -205,44 +194,31 @@ export default function DashboardSidebar({
       </div>
 
       {/* Account and sign out */}
-<div className="relative z-10 mt-3 shrink-0 border-t border-[#D8DED2] px-3 pb-3 pt-3">
-  {/* Modern sign-out button */}
-  <div className="dashboard-sidebar-signout mb-3">
-    <span className="dashboard-sidebar-signout-icon" aria-hidden="true">
-      <LogOut size={15} strokeWidth={1.9} />
-    </span>
+      <div className="relative z-10 mt-3 shrink-0 border-t border-[#D8DED2] px-3 pb-3 pt-3">
+        <div className="dashboard-sidebar-signout mb-3">
+          <span className="dashboard-sidebar-signout-icon" aria-hidden="true">
+            <LogOut size={15} strokeWidth={1.9} />
+          </span>
+          <div className="dashboard-sidebar-logout">
+            <LogoutButton />
+          </div>
+        </div>
 
-    <div className="dashboard-sidebar-logout">
-      <LogoutButton />
-    </div>
-  </div>
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#D8C8A6] text-[10px] font-bold text-[#493E2D]">
+            {getInitials(userName)}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[10px] font-semibold text-[#303A31]">{userName}</p>
+            <p className="mt-0.5 truncate text-[8px] text-[#848A7E]">{userEmail}</p>
+          </div>
+          <CheckCircle2 size={13} className="shrink-0 text-[#6F9271]" />
+        </div>
 
-  {/* User identity */}
-  <div className="flex min-w-0 items-center gap-2">
-    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#D8C8A6] text-[10px] font-bold text-[#493E2D]">
-      {getInitials(userName)}
-    </span>
-
-    <div className="min-w-0 flex-1">
-      <p className="truncate text-[10px] font-semibold text-[#303A31]">
-        {userName}
-      </p>
-
-      <p className="mt-0.5 truncate text-[8px] text-[#848A7E]">
-        {userEmail}
-      </p>
-    </div>
-
-    <CheckCircle2
-      size={13}
-      className="shrink-0 text-[#6F9271]"
-    />
-  </div>
-
-  <p className="mt-2.5 text-center text-[8px] font-medium tracking-[0.08em] text-[#8A9084]">
-    PLAN · ORGANIZE · GROW
-  </p>
-</div>
+        <p className="mt-2.5 text-center text-[8px] font-medium tracking-[0.08em] text-[#8A9084]">
+          PLAN · ORGANIZE · GROW
+        </p>
+      </div>
     </aside>
   );
 }

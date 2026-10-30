@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Inter, Manrope, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui/toast-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,7 +39,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${manrope.variable} ${dmSerif.variable} antialiased`}
       >
-        {children}
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

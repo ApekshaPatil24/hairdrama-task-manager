@@ -1,6 +1,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { connection } from "next/server";
+import { Suspense } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -18,9 +20,11 @@ const footerLinks = [
   { label: "About us", href: "#about" },
 ];
 
-export default function SiteFooter({
+export default async function SiteFooter({
   variant = "landing",
 }: SiteFooterProps) {
+  await connection();
+
   const year = new Date().getFullYear();
   const isLanding = variant === "landing";
 
