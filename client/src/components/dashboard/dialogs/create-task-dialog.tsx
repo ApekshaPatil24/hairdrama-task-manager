@@ -282,13 +282,13 @@ setDirectoryUsers([]);
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#17251f]/45 px-4 py-5 backdrop-blur-[5px]">
-      <section
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-[#17251f]/45 px-3 py-4 backdrop-blur-[5px] sm:items-center sm:px-4 sm:py-6">
+     <section
   role="dialog"
   aria-modal="true"
   aria-labelledby="create-task-title"
-  className="relative w-full max-w-[650px] overflow-visible rounded-[24px] border border-[#e9e9df] bg-[#fffefa] shadow-[0_24px_80px_rgba(23,37,31,0.20)]"
->
+  className="relative my-4 max-h-[calc(100dvh-2rem)] w-full max-w-[650px] overflow-y-auto rounded-[24px] border border-[#e9e9df] bg-[#fffefa] shadow-[0_24px_80px_rgba(23,37,31,0.20)]"
+  >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#edede6] px-6 py-5 sm:px-7">
           <div className="flex items-center gap-3.5">
@@ -395,11 +395,11 @@ setDirectoryUsers([]);
             </div>
 
             {/* Task options */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
               {/* Assignee */}
               
-<div>
+<div className="min-w-0 sm:col-span-2">
   <label htmlFor="task-assignee-search" className={labelClass}>
     Assign to <span className="text-[#bd775d]">*</span>
   </label>
@@ -451,21 +451,17 @@ setDirectoryUsers([]);
 
     {/* Searchable user dropdown */}
     {assigneeMenuOpen && (
-      <div
-  className="
-    absolute left-0 bottom-full z-[160] mb-2
-    w-[min(320px,calc(100vw-2rem)]
-    max-h-[min(360px,calc(100dvh-2rem))]
-    flex flex-col
-    overflow-hidden rounded-xl
-    border border-[#e6e7df] bg-white
-    shadow-[0_12px_35px_rgba(35,54,43,0.14)]
-
-    sm:left-auto sm:right-full sm:bottom-0
-    sm:top-auto sm:mb-0 sm:mr-2
-    sm:w-[300px]
-  "
->
+  <div
+    className="
+      mt-2
+      w-full min-w-0
+      overflow-hidden
+      rounded-xl
+      border border-[#e6e7df]
+      bg-white
+      shadow-[0_12px_35px_rgba(35,54,43,0.14)]
+    "
+  >
         {/* Search input */}
         <div className="border-b border-[#edede6] p-2.5">
           <input
@@ -481,7 +477,7 @@ setDirectoryUsers([]);
           />
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-1.5">
+        <div className="max-h-64 overflow-y-auto overscroll-contain p-1.5">
 
           {/* Built-in assignment choices */}
           <p className="px-2.5 py-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-[#899087]">
