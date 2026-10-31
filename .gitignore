@@ -29,3 +29,7 @@ npm-debug.log*
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Gmail OAuth credentials and tokens
+backend/credentials.json
+backend/token.json

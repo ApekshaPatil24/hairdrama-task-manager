@@ -47,24 +47,28 @@ def serialize_profile(user_id: str | None, profiles: dict) -> dict | None:
         return {
             "id": user_id,
             "fullName": None,
+            "email": None,
             "avatarUrl": None,
         }
 
     return {
         "id": profile["user_id"],
-        "fullName": profile["full_name"],
-        "avatarUrl": profile["avatar_url"],
+        "fullName": profile.get("full_name"),
+        "email": profile.get("email"),
+        "avatarUrl": profile.get("avatar_url"),
     }
 
 
 def fetch_profiles(profile_ids: set[str]) -> dict:
+    """Fetch profile details for task creators and assignees."""
+
     if not profile_ids:
         return {}
 
     response = (
         supabase
         .table("profiles")
-        .select("user_id, full_name, avatar_url")
+        .select("user_id, full_name, email, avatar_url")
         .in_("user_id", list(profile_ids))
         .execute()
     )
@@ -223,7 +227,7 @@ def update_task_status_for_user(
     user_id: str,
     task_id: str,
     new_status: str,
-) -> dict:
+) -> tuple[dict, bool]:
 
     # 1. Validate requested status.
     if new_status not in ALLOWED_TASK_STATUSES:
@@ -308,4 +312,12 @@ def update_task_status_for_user(
     profiles = fetch_profiles(profile_ids)
 
     # 7. Return the updated task in the existing API format.
-    return serialize_task(updated_task, profiles)
+    status_changed_to_completed = (
+        existing_task["status"] != "completed"
+        and new_status == "completed"
+    )
+
+    return (
+        serialize_task(updated_task, profiles),
+        status_changed_to_completed,
+    )

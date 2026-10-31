@@ -1,9 +1,18 @@
 
-from datetime import date
+from datetime import date, datetime
 from typing import Any
 from unicodedata import category
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
+
+# India is the default task timezone.
+# Can be overridden using the TASK_TIMEZONE environment variable.
+import os
+
+TASK_TIMEZONE = ZoneInfo(
+    os.getenv("TASK_TIMEZONE", "Asia/Kolkata")
+)
 
 ALLOWED_FIELDS = {
     "title",
@@ -16,13 +25,18 @@ ALLOWED_FIELDS = {
 ALLOWED_PRIORITIES = {"low", "medium", "high"}
 
 
+def get_today_date() -> date:
+    """Return today's date using the configured application timezone."""
+    return datetime.now(TASK_TIMEZONE).date()
+
+
 def contains_invalid_control_characters(
     value: str,
     *,
     allow_multiline: bool = False,
 ) -> bool:
     """
-    Reject control characters and invalid Unicode surrogate characters.
+    Reject control characters and invalid Unicode surrogates.
 
     Descriptions may contain tabs and line breaks.
     Titles may not contain them.
@@ -41,7 +55,10 @@ def validate_create_task_payload(
     payload: Any,
 ) -> tuple[dict[str, Any] | None, dict[str, str]]:
 
-    # Validate request body.
+    # --------------------------------------------------
+    # 1. REQUEST BODY VALIDATION
+    # --------------------------------------------------
+
     if not isinstance(payload, dict):
         return None, {
             "body": "A valid JSON object is required."
@@ -62,14 +79,17 @@ def validate_create_task_payload(
         )
 
     # --------------------------------------------------
-    # 1. TITLE VALIDATION
+    # 2. TITLE VALIDATION (REQUIRED)
     # --------------------------------------------------
 
     title = payload.get("title")
 
     if not isinstance(title, str):
-        errors["title"] = "Task title is required and must be a string."
+        errors["title"] = (
+            "Task title is required and must be a string."
+        )
         title = ""
+
     else:
         title = title.strip()
 
@@ -87,7 +107,7 @@ def validate_create_task_payload(
             )
 
     # --------------------------------------------------
-    # 2. DESCRIPTION VALIDATION
+    # 3. DESCRIPTION VALIDATION (OPTIONAL)
     # --------------------------------------------------
 
     description = payload.get("description")
@@ -96,7 +116,9 @@ def validate_create_task_payload(
         description = None
 
     elif not isinstance(description, str):
-        errors["description"] = "Description must be a string."
+        errors["description"] = (
+            "Description must be a string."
+        )
 
     else:
         description = description.strip()
@@ -118,87 +140,125 @@ def validate_create_task_payload(
             )
 
     # --------------------------------------------------
-    # 3. ASSIGNEE VALIDATION
+    # 4. ASSIGNEE VALIDATION (REQUIRED SELECTION)
     # --------------------------------------------------
 
-    assigned_to = payload.get("assignedTo")
+    assigned_to = None
 
-    if assigned_to is None:
-        assigned_to = None
-
-    elif not isinstance(assigned_to, str):
+    if "assignedTo" not in payload:
         errors["assignedTo"] = (
-            "Assignee must be a valid user ID."
+            "Please select an assignee or choose Unassigned."
         )
 
     else:
-        assigned_to = assigned_to.strip()
+        assigned_to = payload["assignedTo"]
 
-        if not assigned_to:
+        # Explicit null means the user selected Unassigned.
+        if assigned_to is None:
             assigned_to = None
 
+        elif not isinstance(assigned_to, str):
+            errors["assignedTo"] = (
+                "Assignee must be a valid user ID or null."
+            )
+
         else:
-            try:
-                parsed_uuid = UUID(assigned_to)
-                normalized_uuid = str(parsed_uuid)
+            assigned_to = assigned_to.strip()
 
-                # Accept standard UUID format only.
-                if assigned_to.lower() != normalized_uuid:
-                    raise ValueError("Non-canonical UUID format.")
-
-                assigned_to = normalized_uuid
-
-            except ValueError:
+            if not assigned_to:
                 errors["assignedTo"] = (
-                    "Assignee must be a valid user UUID."
+                    "Please select a valid assignee or choose Unassigned."
+                )
+
+            else:
+                try:
+                    parsed_uuid = UUID(assigned_to)
+                    normalized_uuid = str(parsed_uuid)
+
+                    # Accept standard hyphenated UUID format.
+                    if assigned_to.lower() != normalized_uuid:
+                        raise ValueError("Invalid UUID format.")
+
+                    assigned_to = normalized_uuid
+
+                except ValueError:
+                    errors["assignedTo"] = (
+                        "Assignee must be a valid user UUID."
+                    )
+
+    # --------------------------------------------------
+    # 5. PRIORITY VALIDATION (REQUIRED)
+    # --------------------------------------------------
+
+    if "priority" not in payload:
+        errors["priority"] = (
+            "Please select a task priority."
+        )
+        priority = None
+
+    else:
+        priority = payload["priority"]
+
+        if not isinstance(priority, str):
+            errors["priority"] = (
+                "Priority must be a string."
+            )
+
+        else:
+            priority = priority.strip().lower()
+
+            if priority not in ALLOWED_PRIORITIES:
+                errors["priority"] = (
+                    "Priority must be low, medium, or high."
                 )
 
     # --------------------------------------------------
-    # 4. PRIORITY VALIDATION
+    # 6. DUE DATE VALIDATION (REQUIRED)
     # --------------------------------------------------
 
-    priority = payload.get("priority", "medium")
-
-    if not isinstance(priority, str):
-        errors["priority"] = "Priority must be a string."
-
-    else:
-        priority = priority.strip().lower()
-
-        if priority not in ALLOWED_PRIORITIES:
-            errors["priority"] = (
-                "Priority must be low, medium, or high."
-            )
-
-    # --------------------------------------------------
-    # 5. DUE DATE VALIDATION
-    # --------------------------------------------------
-
-    due_date = payload.get("dueDate")
-
-    if due_date is None or due_date == "":
+    if "dueDate" not in payload:
+        errors["dueDate"] = (
+            "Due date is required."
+        )
         due_date = None
 
-    elif not isinstance(due_date, str):
-        errors["dueDate"] = (
-            "Due date must be a YYYY-MM-DD string."
-        )
-
     else:
-        try:
-            parsed_date = date.fromisoformat(due_date)
+        due_date = payload["dueDate"]
 
-            # Reject alternative formats and impossible dates.
-            if parsed_date.isoformat() != due_date:
-                raise ValueError("Invalid date format.")
-
-        except ValueError:
+        if not isinstance(due_date, str):
             errors["dueDate"] = (
-                "Enter a valid due date in YYYY-MM-DD format."
+                "Due date must be a YYYY-MM-DD string."
             )
 
+        else:
+            due_date = due_date.strip()
+
+            if not due_date:
+                errors["dueDate"] = (
+                    "Due date is required."
+                )
+
+            else:
+                try:
+                    parsed_date = date.fromisoformat(due_date)
+
+                    # Reject alternative formats and impossible dates.
+                    if parsed_date.isoformat() != due_date:
+                        raise ValueError("Invalid date format.")
+
+                    # Reject dates earlier than today.
+                    if parsed_date < get_today_date():
+                        errors["dueDate"] = (
+                            "Past due dates are not allowed."
+                        )
+
+                except ValueError:
+                    errors["dueDate"] = (
+                        "Enter a valid future or today's date in YYYY-MM-DD format."
+                    )
+
     # --------------------------------------------------
-    # 6. FINAL VALIDATION RESULT
+    # 7. FINAL VALIDATION RESULT
     # --------------------------------------------------
 
     if errors:

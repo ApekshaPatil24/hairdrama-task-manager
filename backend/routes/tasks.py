@@ -12,6 +12,11 @@ from services.task_service import (
     update_task_status_for_user,
 )
 
+from services.email_service import (
+    send_task_created_notification,
+    send_task_completed_notification,
+)
+
 from validators.task_validator import validate_create_task_payload
 
 
@@ -21,6 +26,10 @@ tasks_bp = Blueprint(
     url_prefix="/api/tasks",
 )
 
+
+# --------------------------------------------------
+# GET ALL TASKS
+# --------------------------------------------------
 
 @tasks_bp.get("")
 @require_auth
@@ -72,6 +81,9 @@ def get_tasks():
         }), 500
 
 
+# --------------------------------------------------
+# CREATE TASK + EMAIL NOTIFICATION
+# --------------------------------------------------
 
 @tasks_bp.post("")
 @require_auth
@@ -79,7 +91,7 @@ def create_task():
 
     user_id = g.current_user["id"]
 
-    # 1. Require a valid JSON request body.
+    # 1. Validate JSON request body.
     payload = request.get_json(silent=True)
 
     if not isinstance(payload, dict):
@@ -88,11 +100,9 @@ def create_task():
             "error": "A valid JSON request body is required.",
         }), 400
 
-    # 2. Validate and normalize incoming data.
+    # 2. Validate and normalize task data.
     task_data, errors = validate_create_task_payload(payload)
 
-    # 3. Stop execution if validation fails.
-    # No task service or database INSERT is called.
     if errors or task_data is None:
         return jsonify({
             "success": False,
@@ -100,17 +110,31 @@ def create_task():
             "details": errors,
         }), 422
 
-    # 4. Create the task only after successful validation.
+    # 3. Create the task.
     try:
         created_task = create_task_for_user(
             user_id,
             task_data,
         )
 
+        # 4. Send notification without undoing task creation.
+        try:
+            send_task_created_notification(created_task)
+            notification_sent = True
+
+        except Exception:
+            notification_sent = False
+
+            current_app.logger.exception(
+                "Task %s was created, but notification email failed.",
+                created_task["id"],
+            )
+
         return jsonify({
             "success": True,
             "message": "Task created successfully.",
             "task": created_task,
+            "notificationSent": notification_sent,
         }), 201
 
     except AssigneeNotFoundError as error:
@@ -131,6 +155,10 @@ def create_task():
         }), 500
 
 
+# --------------------------------------------------
+# UPDATE TASK STATUS + COMPLETION NOTIFICATION
+# --------------------------------------------------
+
 @tasks_bp.patch("/<task_id>/status")
 @require_auth
 def update_task_status(task_id):
@@ -146,7 +174,7 @@ def update_task_status(task_id):
             "error": "A valid JSON request body is required.",
         }), 400
 
-    # 2. Only the status field is allowed.
+    # 2. Only status is allowed.
     if set(payload.keys()) != {"status"}:
         return jsonify({
             "success": False,
@@ -162,7 +190,10 @@ def update_task_status(task_id):
         "completed",
     }
 
-    if not isinstance(new_status, str) or new_status not in allowed_statuses:
+    if (
+        not isinstance(new_status, str)
+        or new_status not in allowed_statuses
+    ):
         return jsonify({
             "success": False,
             "error": (
@@ -170,18 +201,35 @@ def update_task_status(task_id):
             ),
         }), 422
 
-    # 4. Update task.
+    # 4. Update status.
     try:
-        updated_task = update_task_status_for_user(
+        updated_task, should_notify = update_task_status_for_user(
             user_id,
             task_id,
             new_status,
         )
 
+        notification_sent = None
+
+        # 5. Send email only when the task becomes completed.
+        if should_notify:
+            try:
+                send_task_completed_notification(updated_task)
+                notification_sent = True
+
+            except Exception:
+                notification_sent = False
+
+                current_app.logger.exception(
+                    "Task %s was completed, but notification email failed.",
+                    task_id,
+                )
+
         return jsonify({
             "success": True,
             "message": "Task status updated successfully.",
             "task": updated_task,
+            "notificationSent": notification_sent,
         }), 200
 
     except InvalidTaskStatusError as error:
