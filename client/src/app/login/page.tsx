@@ -1,4 +1,5 @@
 
+import { Suspense } from "react";
 import Image from "next/image";
 import GoogleSignInButton from "@/components/auth/google-sign-in-button";
 import SiteHeader from "@/components/landing/site-header";
@@ -271,7 +272,16 @@ export default function LoginPage() {
         </section>
       </div>
     </main>
-    <SiteFooter variant="inner" />
+   <Suspense
+  fallback={
+    <footer
+      aria-hidden="true"
+      className="min-h-[58px] border-t border-white/10 bg-[#19231D]"
+    />
+  }
+>
+  <SiteFooter variant="inner" />
+</Suspense>
   </div>
   );
 }
